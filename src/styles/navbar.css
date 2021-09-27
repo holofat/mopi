@@ -1,0 +1,35 @@
+.navbar{
+  border-bottom: 1px solid #E2E5E6;
+  padding: 0 10vw;
+}
+
+.nav-link{
+  margin: 0 10px;
+}
+
+.current{
+  color: #3898EC !important;
+}
+
+.navbar-nav{
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+
+
+@media only screen and (max-width:768px){
+  .profile{
+    display: none;
+  }
+  .navbar{
+    padding: 0 2vw;
+  }
+  .nav-link{
+    margin: 0;
+  }
+  .navbar-nav{
+    justify-content: baseline;
+  }
+}
