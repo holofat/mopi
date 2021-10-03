@@ -13,7 +13,7 @@
 
 .navbar-nav{
   display: flex;
-  justify-content: center;
+  justify-content:flex-end;
   width: 100%;
 }
 

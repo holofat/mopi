@@ -1,6 +1,10 @@
 .container{
+  min-height: 100vh;
   width: 62vw;
-  padding: 2vh 0;
+}
+
+.select{
+  width: 100% !important;
 }
 
 @media only screen and (max-width:768px){

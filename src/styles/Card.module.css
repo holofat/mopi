@@ -1,0 +1,17 @@
+.card{
+  position: relative;
+  height: 65vh;
+  padding: 10px;
+}
+
+
+.favorite{
+  position: absolute;
+  background-color: white;
+  border: none;
+  bottom: 89px;
+  right: 10px;
+  padding: 2px;
+  width: 38px;
+  height: 38px;
+}
