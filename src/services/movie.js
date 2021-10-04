@@ -92,3 +92,9 @@ export const getRecommendations = id => {
   const request = axios.get(url).then(res => res.data)
   return request
 }
+
+export const getDiscoverByGenre = id => {
+  const url = `https://api.themoviedb.org/3/discover/movie?api_key=1bc3f22930b9e6ac9ec9188b3b0ee950&language=en-US&sort_by=vote_count.desc&include_adult=false&include_video=false&page=1&with_genres=${id}&with_watch_monetization_types=flatrate`
+  const request = axios.get(url).then(res => res.data)
+  return request
+}

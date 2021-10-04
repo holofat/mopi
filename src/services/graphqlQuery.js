@@ -69,9 +69,9 @@ subscription MySubscription($id_movie: Int = 10, $id_user: uuid = "") {
 }`
 
 export const addRatingQuery = gql`
-mutation MyMutation($id_movie: Int = 10, $id_user: uuid = "", $rating: Int = 10) {
-  insert_ratings(objects: {id_movie: $id_movie, id_user: $id_user, rating: $rating}) {
-    affected_rows
+mutation MyMutation($id_movie: Int = 10, $id_user: uuid = "", $poster: String = "", $rating: Int = 10, $title: String = "") {
+  insert_ratings_one(object: {id_movie: $id_movie, id_user: $id_user, poster: $poster, rating: $rating, title: $title}) {
+    id
   }
 }`
 
@@ -108,5 +108,41 @@ export const deleteReviewQuery = gql`
 mutation MyMutation($id_movie: Int = 10, $id_user: uuid = "") {
   delete_reviews(where: {id_movie: {_eq: $id_movie}, id_user: {_eq: $id_user}}) {
     affected_rows
+  }
+}`
+
+export const getUsersById = gql`
+query MyQuery($id: uuid = "") {
+  users(where: {id: {_eq: $id}}) {
+    email
+    username
+  }
+}`
+
+export const getRatingLatestQuery = gql`
+query MyQuery($id_user: uuid = "") {
+  ratings(order_by: {created_at: desc}, where: {id_user: {_eq: $id_user}}, limit: 1) {
+    id_movie
+    poster
+    title
+    rating
+  }
+}`
+
+export const getLatestFavoriteQuery = gql`
+query MyQuery($id_user: uuid = "") {
+  fav_movie(order_by: {created_at: desc}, where: {id_user: {_eq: $id_user}}, limit: 1) {
+    id_movie
+    poster
+    title
+  }
+}`
+
+export const getLatestWatchlistQuery = gql`
+query MyQuery($id_user: uuid = "") {
+  watchlist(order_by: {created_at: desc}, where: {id_user: {_eq: $id_user}}, limit: 1) {
+    id_movie
+    poster
+    title
   }
 }`

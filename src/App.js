@@ -21,6 +21,7 @@ import {useSelector} from 'react-redux'
 import Register from './components/User/Register';
 import TopRated from './components/TopRated';
 import { Detail } from './components/Detail';
+import Profile from './components/Profile';
 
 
 
@@ -45,7 +46,7 @@ function App() {
               <Link to="/top-rated" className={`nav-link ${page === 'Top Rated' && 'current'}`}>Top Rated</Link>
               {user && <>
                 <Link to="/your-list" className={`nav-link ${page === 'Your List' && 'current'}`}>Your Lists</Link>
-                <Link to="/profile" className="nav-link">Profile</Link>
+                <Link to="/profile" className={`nav-link ${page === 'Profile' && 'current'}`}>Profile</Link>
                 <a href="/logout" className="nav-link">Log Out</a>
               </>}
               {!user && <>
@@ -82,6 +83,9 @@ function App() {
         </Route>
         <Route path="/your-list">
           <YourList/>
+        </Route>
+        <Route path="/profile">
+          <Profile/>
         </Route>
       </Switch>
 

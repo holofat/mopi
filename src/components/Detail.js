@@ -16,7 +16,6 @@ import _ from 'lodash'
 import Swal from 'sweetalert2'
 import { Redirect } from 'react-router'
 import { getReview } from '../services/movie'
-import { Link } from 'react-router-dom'
 import Card from './Card'
 
 
@@ -85,7 +84,7 @@ export const Detail = () => {
 
   // If movie's data is not loaded, then return loader
   if(!movie.id){
-    return <Code/>
+    return <Code className="container"/>
   }
 
   const userInfo = {
@@ -150,15 +149,13 @@ export const Detail = () => {
     }).then(res => {
       if(res.isConfirmed){
         if(rating === '-'){
-          addRating({variables: {...userInfo, rating:res.value} })
+          addRating({variables: {...userInfo, rating:res.value, poster: movie?.poster_path, title: movie?.title} })
         } else{
           updateRating({variables: {...userInfo, rating: res.value}})
         }
       }
     })
   } 
-
-  console.log(reviewLoading)
 
   const hanldeAddAndUpdateReview = e => {
     e.preventDefault()
@@ -248,7 +245,7 @@ export const Detail = () => {
         </>}
         {myReview && !reviewLoading &&
           <div className={`form form-control my-2 ${style.review}`} >
-            <b>Your Review</b> - {parseInt(rating)}/10<br/> 
+            <b>Your Review</b> - {rating ? parseInt(rating):'-'}/10<br/> 
             {myReview}<br/>
             <button className={`btn my-2 btn-info text-white`} onClick={handleEdit}>Edit</button>
             <button className="btn btn-danger mx-2" onClick={handleDeleteReview}>Delete</button>
@@ -259,13 +256,12 @@ export const Detail = () => {
           </div>}
 
 
-        {reviews?.slice(0, 2).map(review =>
+        {reviews?.slice(0, 3).map(review =>
           <div key={review.id} className={`form form-control my-2 ${style.review}`} >
             <b>{review.author_details.username}</b> | {review.author_details.rating ? parseInt(review.author_details.rating) : '-'}/10<br/> 
             {review.content}
           </div> 
         )}
-        {reviews.length > 2 && <Link to="/reviews/:movieId">Click to See More Reviews</Link>}
       </div>
 
       <div className="border-dark border-3 p-3 border-top my-3">

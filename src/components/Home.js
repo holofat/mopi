@@ -19,11 +19,19 @@ function Home() {
   useTitle('Home')
 
   useEffect(() => {
-    getTrendingToday().then(res => setTrending(res.results))
-    getNowPlaying().then(res => setNowPlaying(res.results))
+    getData()
     dispatch(setPage('Home'))
+    return () => {
+      setTrending([])
+      setNowPlaying([])
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const getData = () => {
+    getTrendingToday().then(res => setTrending(res.results))
+    getNowPlaying().then(res => setNowPlaying(res.results))
+  }
 
   return (
     <div className={`container ${style.container}`}>

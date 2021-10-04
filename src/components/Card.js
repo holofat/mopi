@@ -17,7 +17,7 @@ import Swal from 'sweetalert2'
 import {Redirect} from 'react-router-dom'
 
 
-function Card({id, title, poster}) {
+function Card({id, title, poster, rating}) {
   const img = poster ? `https://image.tmdb.org/t/p/w500${poster}` : noImage
   const user = useSelector(state => state.user)
   const {data, loading} = useSubscription(getFavoriteQuery, {variables: {id: user}})

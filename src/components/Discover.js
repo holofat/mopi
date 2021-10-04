@@ -9,7 +9,8 @@ import {
   getDiscover,
   getDiscoverByVoteCount,
   searchMovie,
-  getDiscoverByRating
+  getDiscoverByRating,
+  getDiscoverByGenre
 } from '../services/movie'
 import { useTitle } from 'react-use'
 import {useDispatch} from 'react-redux'
@@ -21,6 +22,7 @@ function Discover() {
   const [genreList, setGenreList] = useState([])
   const [discover, setDiscover] = useState([])
   const [query, setQuery] = useState('')
+  
   useTitle('Discover')
   
   useEffect(() => {
@@ -52,6 +54,14 @@ function Discover() {
 
   const handleRating = e => {
     getDiscoverByRating(e.target.value).then(res => setDiscover(res.results))
+  }
+
+  const handleGenre = e => {
+    const genre = e.target.value
+    console.log(genre)
+    if(genre !== 'all'){
+      getDiscoverByGenre(genre).then(res => setDiscover(res.results))
+    }
   }
 
   return (
@@ -111,10 +121,10 @@ function Discover() {
         <div>
           <label htmlFor="genre">
             Genre<br/>
-            <select name="genre" className="form-select">
+            <select name="genre" className="form-select" onChange={handleGenre}>
               <option value="all">All</option>
               {genreList?.map(genre => 
-                <option key={genre.id} value={genre.name}>{genre.name}</option>  
+                <option key={genre.id} value={genre.id}>{genre.name}</option>  
               )}
             </select>
           </label>
