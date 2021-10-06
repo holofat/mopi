@@ -29,73 +29,80 @@ function App() {
   const page = useSelector(state => state.page)
   const user = useSelector(state => state.user)
 
+  const handleScroll = () => {
+    console.log('test')
+  }
+
   return (
-    <Router>
-      <nav className="navbar navbar-expand-md navbar-light">
-        <div className="container-fluid d-flex justify-content-between" >
-          <a href="/#" className="navbar-brand">
-            <img src={logo_navbar} width="120" height="50" alt="navbar-img"/>
-          </a>
-          <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu" aria-controls="menu" aria-expanded="false" aria-label="Toggle navigation">
-            <span className="navbar-toggler-icon"></span>
-          </button>
-          <div className="collapse navbar-collapse" id="menu">
-            <div className="navbar-nav">
-              <Link to="/" className={`nav-link ${page === 'Home' && 'current'}`}>Home</Link>
-              <Link to="/discover" className={`nav-link ${page === 'Discover' && 'current'}`}>Discover</Link>
-              <Link to="/top-rated" className={`nav-link ${page === 'Top Rated' && 'current'}`}>Top Rated</Link>
-              {user && <>
-                <Link to="/your-list" className={`nav-link ${page === 'Your List' && 'current'}`}>Your Lists</Link>
-                <Link to="/profile" className={`nav-link ${page === 'Profile' && 'current'}`}>Profile</Link>
-                <a href="/logout" className="nav-link">Log Out</a>
-              </>}
-              {!user && <>
-                <Link to="/login" className={`nav-link ${page === 'Login' && 'current'}`}>Login</Link>
-              </>}
-              
+    <div onScroll={handleScroll}>
+      <Router>
+        <nav className="navbar navbar-expand-md navbar-light">
+          <div className="container-fluid d-flex justify-content-between" >
+            <a href="/#" className="navbar-brand">
+              <img src={logo_navbar} width="120" height="50" alt="navbar-img"/>
+            </a>
+            <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu" aria-controls="menu" aria-expanded="false" aria-label="Toggle navigation">
+              <span className="navbar-toggler-icon"></span>
+            </button>
+            <div className="collapse navbar-collapse" id="menu">
+              <div className="navbar-nav">
+                <Link to="/" className={`nav-link ${page === 'Home' && 'current'}`}>Home</Link>
+                <Link to="/discover" className={`nav-link ${page === 'Discover' && 'current'}`}>Discover</Link>
+                <Link to="/top-rated" className={`nav-link ${page === 'Top Rated' && 'current'}`}>Top Rated</Link>
+                {user && <>
+                  <Link to="/your-list" className={`nav-link ${page === 'Your List' && 'current'}`}>Your Lists</Link>
+                  <Link to="/profile" className={`nav-link ${page === 'Profile' && 'current'}`}>Profile</Link>
+                  <a href="/logout" className="nav-link">Log Out</a>
+                </>}
+                {!user && <>
+                  <Link to="/login" className={`nav-link ${page === 'Login' && 'current'}`}>Login</Link>
+                </>}
+                
+              </div>
             </div>
           </div>
-        </div>
-      </nav>
-      
+        </nav>
+        
 
-      <Switch>
-        <Route path="/" exact>
-          <Home/>
-        </Route>
-        <Route path="/discover">
-          <Discover/>
-        </Route>
-        <Route path="/login">
-          <Login/>
-        </Route>
-        <Route path="/logout">
-          <Logout/>
-        </Route>
-        <Route path="/register">
-          <Register/>
-        </Route>
-        <Route path="/top-rated">
-          <TopRated/>
-        </Route>
-        <Route path="/detail/:movieId">
-          <Detail/>
-        </Route>
-        <Route path="/your-list">
-          <YourList/>
-        </Route>
-        <Route path="/profile">
-          <Profile/>
-        </Route>
-      </Switch>
+        <Switch>
+          <Route path="/" exact>
+            <Home/>
+          </Route>
+          <Route path="/discover">
+            <Discover/>
+          </Route>
+          <Route path="/login">
+            <Login/>
+          </Route>
+          <Route path="/logout">
+            <Logout/>
+          </Route>
+          <Route path="/register">
+            <Register/>
+          </Route>
+          <Route path="/top-rated">
+            <TopRated/>
+          </Route>
+          <Route path="/detail/:movieId">
+            <Detail/>
+          </Route>
+          <Route path="/your-list">
+            <YourList/>
+          </Route>
+          <Route path="/profile">
+            <Profile/>
+          </Route>
+        </Switch>
 
-      <footer className={`bg-dark text-center p-2 ${page === 'Login' && 'fixed-bottom'}`}>
-        <FaInstagram className="mx-4" style={{width:'30px', height:'30px', color:'white'}}/>
-        <FaTwitter className="mx-4" style={{width:'30px', height:'30px', color:'white'}}/>
-        <FaFacebook className="mx-4" style={{width:'30px', height:'30px', color:'white'}}/><br/>
-        <div style={{fontSize: '0.8em'}} className="my-2 text-white fw-light">&#169; 2021 by MFYZ. All Rights Reserved.</div>
-      </footer>
-    </Router>
+        <footer className={`bg-dark text-center p-2 ${page === 'Login' && 'fixed-bottom'}`}>
+          <FaInstagram className="mx-4" style={{width:'30px', height:'30px', color:'white'}}/>
+          <FaTwitter className="mx-4" style={{width:'30px', height:'30px', color:'white'}}/>
+          <FaFacebook className="mx-4" style={{width:'30px', height:'30px', color:'white'}}/><br/>
+          <div style={{fontSize: '0.8em'}} className="my-2 text-white fw-light">&#169; 2021 by MFYZ. All Rights Reserved.</div>
+        </footer>
+      </Router>
+    </div>
+
   );
 }
 

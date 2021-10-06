@@ -10,7 +10,8 @@ import {
   getDiscoverByVoteCount,
   searchMovie,
   getDiscoverByRating,
-  getDiscoverByGenre
+  getDiscoverByGenre,
+  getDiscoverByDate
 } from '../services/movie'
 import { useTitle } from 'react-use'
 import {useDispatch} from 'react-redux'
@@ -20,14 +21,23 @@ import {setPage} from '../reducers/pageReducer'
 function Discover() {
   const dispatch = useDispatch()
   const [genreList, setGenreList] = useState([])
+  const [genre, setGenre] = useState('all')
   const [discover, setDiscover] = useState([])
   const [query, setQuery] = useState('')
+  const [pages, setPages] = useState({
+    total_pages: 1,
+    page: 1,
+    set: 'discover'
+  })
   
   useTitle('Discover')
   
   useEffect(() => {
     getGenreList().then(res => setGenreList(res.genres))
-    getDiscover().then(res => setDiscover(res.results))
+    getDiscover().then(res => {
+      setDiscover(res.results)
+      setPages({...pages, total_pages: res.total_pages})
+    })
     dispatch(setPage('Discover'))
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -37,7 +47,20 @@ function Discover() {
     const sort = e.target.value
     if(!query){
       if(sort === 'vote_count'){
-        getDiscoverByVoteCount().then(res => setDiscover(res.results))
+        getDiscoverByVoteCount().then(res => {
+          setDiscover(res.results)
+          setPages({page:1, total_pages: res.total_pages, set: 'vote'})
+        })
+      } else if(sort === 'latest'){
+        getDiscoverByDate().then(res => {
+          setDiscover(res.results)
+          setPages({page: 1, total_pages: res.total_pages, set: 'latest'})
+        })
+      } else if(sort === 'popularity'){
+        getDiscover().then(res => {
+          setDiscover(res.results)
+          setPages({page:1, set:'discover', total_pages: res.total_pages})
+        })
       }
     } else{
       console.log("Test")
@@ -48,22 +71,65 @@ function Discover() {
   const handleSearch = e => {
     e.preventDefault()
     const query = e.target[0].value
-    searchMovie(query).then(res => setDiscover(res.results))
+    searchMovie(query).then(res => {
+      setDiscover(res.results)
+      setPages({page:1, total_pages: res.total_pages, set: 'search'})
+    })
     setQuery(query)
   }
 
   const handleRating = e => {
-    getDiscoverByRating(e.target.value).then(res => setDiscover(res.results))
+    getDiscoverByRating(e.target.value).then(res => {
+      setDiscover(res.results)
+      setPages({page: 1, set: 'rating', total_pages: res.total_pages})
+    })
   }
 
   const handleGenre = e => {
     const genre = e.target.value
-    console.log(genre)
     if(genre !== 'all'){
-      getDiscoverByGenre(genre).then(res => setDiscover(res.results))
+      getDiscoverByGenre(genre).then(res => {
+        setDiscover(res.results)
+        setGenre(genre)
+        setPages({page: 1,set: 'genre', total_pages: res.total_pages})
+      })
     }
   }
 
+  const handlePagination = e => {
+    if(pages.set === 'discover'){
+      getDiscover(e.target.value).then(res => {
+        setDiscover(res.results)
+        setPages({...pages, page: parseInt(e.target.value)})
+      })
+    } else if(pages.set === 'search'){
+      searchMovie(query, e.target.value).then(res => {
+        setDiscover(res.results)
+        setPages({...pages, page:parseInt(e.target.value)})
+      })
+    } else if(pages.set === 'genre'){
+      getDiscoverByGenre(genre, e.target.value).then(res => {
+        setDiscover(res.results)
+        setPages({...pages, page: parseInt(e.target.value)})
+      })
+    } else if(pages.set === 'latest'){
+      getDiscoverByDate(e.target.value).then(res => {
+        setDiscover(res.results)
+        setPages({...pages, page: parseInt(e.target.value)})
+      })
+    } else if(pages.set === 'vote'){
+      getDiscoverByVoteCount(e.target.value).then(res => {
+        setDiscover(res.results)
+        setPages({...pages, page: parseInt(e.target.value)})
+      })
+    } else if(pages.set === 'rating'){
+      getDiscoverByRating(e.target.value).then(res => {
+        setDiscover(res.results)
+        setPages({...pages, page: parseInt(e.target.value)})
+      })
+    }
+  }
+  
   return (
     <div className={`${style.container} container`}>
       <form className="row w-100" onSubmit={handleSearch}>
@@ -105,19 +171,6 @@ function Discover() {
           </label>
         </div>
 
-        <div className="">
-          <label htmlFor="year">
-            Year<br/>
-            <select name="year" className="form-select w-100">
-              <option value="all" defaultValue={true}>All</option>
-              <option value="2010">2011-Now</option>
-              <option value="1990">1991-2010</option>
-              <option value="1970">1971-1990</option>
-              <option value="1900">1900-1970</option>
-            </select>
-          </label>
-        </div>
-
         <div>
           <label htmlFor="genre">
             Genre<br/>
@@ -137,6 +190,13 @@ function Discover() {
             <Card key={movie.id} id={movie.id} title={movie.title} name={movie.name} poster={movie.poster_path}/>  
           )}
       </div>
+      <ul className="pagination justify-content-center">
+        {pages?.total_pages > 1 && pages?.total_pages > 10 && [...Array(10)].map((x, i) => <li key={i} className={`page-item ${pages.page === i+1 && 'active'}`}><input type="button" className="page-link" onClick={handlePagination} value={i+1}/></li>)}
+
+        {pages?.total_pages > 1 && pages?.total_pages <= 10 && [...Array(pages?.total_pages)].map((x, i) => <li key={i} className={`page-item ${pages.page === i+1 && 'active'}`}><input type="button" className="page-link" onClick={handlePagination} value={i+1}/></li>)}
+
+        {pages.total_pages === 1 && <li className="page-item active"><input type="button" className="page-link" value="1"/></li>}
+      </ul>
 
       
     </div>

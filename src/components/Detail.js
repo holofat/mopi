@@ -1,27 +1,27 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect, useState} from 'react'
-import { useParams } from 'react-router'
+import { useHistory, useParams } from 'react-router'
 import { useTitle } from 'react-use'
+import ReactPlayer from 'react-player'
 
-import { getDetail, getCredit, getSimilarById } from '../services/movie'
+import { getDetail, getCredit, getSimilarById, getTrailer } from '../services/movie'
 import style from '../styles/Detail.module.css'
 
 import { Code } from 'react-content-loader'
 import {useSubscription, useMutation} from '@apollo/client'
 
-import {addFavoriteQuery, addWatchlistQuery, getFavoriteByIdQuery, getWatchlistByIdQuery, removeFavoriteQuery, removeWatchlistQuery, getRatingQuery, addRatingQuery, updateRatingQuery, addReviewQuery, updateReviewQuery, getReviewByIdQuery, deleteReviewQuery} from '../services/graphqlQuery'
+import {addFavoriteQuery, addWatchlistQuery, getFavoriteByIdQuery, getWatchlistByIdQuery, removeFavoriteQuery, removeWatchlistQuery, getRatingQuery, addRatingQuery, updateRatingQuery, addReviewQuery, updateReviewQuery, getReviewByIdQuery, deleteReviewQuery, getAllReviewQuery} from '../services/graphqlQuery'
 import {useSelector, useDispatch} from 'react-redux'
 import { setPage } from '../reducers/pageReducer'
 import _ from 'lodash'
 import Swal from 'sweetalert2'
-import { Redirect } from 'react-router'
 import { getReview } from '../services/movie'
 import Card from './Card'
 
 
 export const Detail = () => {
   const user = useSelector(state => state.user)
-
+  const history = useHistory()
   let {movieId} = useParams()
   const [movie, setMovie] = useState({})
   const [credits, setCredits] = useState({})
@@ -31,6 +31,7 @@ export const Detail = () => {
   const {data:watchList, loading:watchlistLoading} = useSubscription(getWatchlistByIdQuery, {variables: {id: user, id_movie: movieId}})
   const {data:dataRating, loading:ratingLoading} = useSubscription(getRatingQuery, {variables: {id_user: user, id_movie: movieId}})
   const {data: myReviewData, loading:reviewLoading} = useSubscription(getReviewByIdQuery, {variables: {id_user: user, id_movie: movieId}})
+  const {data: allReviewData} = useSubscription(getAllReviewQuery, {variables: {id_movie: movieId}})
 
 
   const [addFavorite] = useMutation(addFavoriteQuery)
@@ -50,6 +51,8 @@ export const Detail = () => {
   const [myReview, setMyReview] = useState([])
   const [similar, setSimilar] = useState()
   const [show, setShow] = useState('none')
+  const [allReview, setAllReview] = useState([])
+  const [trailerId, setTrailerId] = useState([])
   
   const dispatch = useDispatch()
   dispatch(setPage(''))
@@ -74,10 +77,16 @@ export const Detail = () => {
   }, [dataRating])
 
   useEffect(() => {
+    const data = allReviewData?.reviews
+    setAllReview(data)
+  }, [allReviewData])
+
+  useEffect(() => {
     getDetail(movieId).then(res => setMovie(res))
     getCredit(movieId).then(res => setCredits(res.crew))
     getReview(movieId).then(res => setReviews(res.results))
     getSimilarById(movieId).then(res => setSimilar(res.results))
+    getTrailer(movieId).then(res => setTrailerId(res.results[0]))
   }, [])
 
   useTitle(movie.title ? movie.title : 'Loading')
@@ -106,7 +115,7 @@ export const Detail = () => {
       confirmButtonText: 'Login'
     }).then((result) => {
       if (result.isConfirmed) {
-        return <Redirect to="/login"/>
+        history.push('/login')
       }
     })
   }
@@ -136,25 +145,29 @@ export const Detail = () => {
   }
 
   const handleRating = () => {
-    Swal.fire({
-      title: 'Give your rating',
-      input: 'range',
-      inputLabel: 'Rating',
-      inputAttributes: {
-        min:0,
-        max:10,
-        step: 1
-      },
-      inputValue: rating === '-' ? 0 : rating 
-    }).then(res => {
-      if(res.isConfirmed){
-        if(rating === '-'){
-          addRating({variables: {...userInfo, rating:res.value, poster: movie?.poster_path, title: movie?.title} })
-        } else{
-          updateRating({variables: {...userInfo, rating: res.value}})
+    if(user){
+      Swal.fire({
+        title: 'Give your rating',
+        input: 'range',
+        inputLabel: 'Rating',
+        inputAttributes: {
+          min:0,
+          max:10,
+          step: 1
+        },
+        inputValue: rating === '-' ? 0 : rating 
+      }).then(res => {
+        if(res.isConfirmed){
+          if(rating === '-'){
+            addRating({variables: {...userInfo, rating:res.value, poster: movie?.poster_path, title: movie?.title} })
+          } else{
+            updateRating({variables: {...userInfo, rating: res.value}})
+          }
         }
-      }
-    })
+      })
+    } else{
+      loginFirst('rating')
+    }
   } 
 
   const hanldeAddAndUpdateReview = e => {
@@ -166,6 +179,12 @@ export const Detail = () => {
       updateReview({variables: {...userInfo, review:review}})
       setShow('none')
     }
+  }
+
+  const handleAnonReview = e => {
+    e.preventDefault()
+    const review = e.target[0].value
+    addReview({variables: {id_user: "fcc96626-f23c-4381-8dbc-231c330753ea", id_movie: movie.id, review: review}})
   }
 
   const handleDeleteReview = e => {
@@ -202,9 +221,14 @@ export const Detail = () => {
               {screenplay}
             </div>
           </div>
+          <div>
+            <b>Overview</b><br/>
+            {movie.overview}
+          </div>
           <div className="mb-1 row w-100">
-            {favLoading && watchlistLoading && ratingLoading && <Code/>}
-            {!favLoading && !watchlistLoading && !ratingLoading && 
+            {!user && ''}
+            {favLoading && watchlistLoading && ratingLoading && user && <Code/>}
+            {!favLoading && !watchlistLoading && !ratingLoading && user  && 
               <>
                 <div className="col-sm">
                   <b>Your Rating</b><br/>
@@ -236,14 +260,21 @@ export const Detail = () => {
       <div className="w-100 border-dark border-3 p-3 border-top my-3">
         <h4 className="text-decoration-underline mb-3">User Reviews </h4>
         {reviewLoading && <Code/>}
-        {!myReview && !reviewLoading && <>
+        {!user && <>
+          <u>Give your review</u>
+          <form className="my-1" onSubmit={handleAnonReview}>
+            <textarea className={`${style.textArea} mb-3 form-control`}/>
+            <button type="submit" className="btn btn-dark fs-6">Add Review</button>
+          </form>
+        </>}
+        {!myReview && !reviewLoading && user && <>
           <u>Give your review</u>
           <form className="my-1" onSubmit={hanldeAddAndUpdateReview}>
             <textarea className={`${style.textArea} mb-3 form-control`}/>
             <button type="submit" className="btn btn-dark fs-6">Add Review</button>
           </form>
         </>}
-        {myReview && !reviewLoading &&
+        {myReview && !reviewLoading && user &&
           <div className={`form form-control my-2 ${style.review}`} >
             <b>Your Review</b> - {rating ? parseInt(rating):'-'}/10<br/> 
             {myReview}<br/>
@@ -255,6 +286,12 @@ export const Detail = () => {
             </form>
           </div>}
 
+        {allReview?.map((review,id) => 
+          <div key={id} className={`form form-control my-2 ${style.review}`} >
+            <b>{review.name.username}</b> | {review.name.rating_user.length !== 0 ? review.name.rating_user[0].rating : '-'}/10<br/> 
+            {review.review}
+          </div>   
+        )}
 
         {reviews?.slice(0, 3).map(review =>
           <div key={review.id} className={`form form-control my-2 ${style.review}`} >
@@ -262,6 +299,14 @@ export const Detail = () => {
             {review.content}
           </div> 
         )}
+      </div>
+
+      <div className="w-100 border-3 border-dark border-top my-3 p-3">
+        <h4 className="text-decoration-underline mb-3">Trailer {movie?.title}</h4>
+        <div className="d-flex justify-content-center">
+          <ReactPlayer url={`https://www.youtube.com/watch?v=${trailerId?.key}`}/>
+        </div>
+          
       </div>
 
       <div className="border-dark border-3 p-3 border-top my-3">

@@ -5,7 +5,6 @@ import {persistStore, persistReducer} from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import pageReducer from './reducers/pageReducer'
 import userReducer from './reducers/userReducer'
-import movieReducer from './reducers/movieReducer'
 
 const persistConfig = {
   key:'root',
@@ -14,8 +13,7 @@ const persistConfig = {
 
 const reducer = combineReducers({
   page: pageReducer,
-  user: userReducer,
-  movie: movieReducer
+  user: userReducer
 })
 
 const persistedReducer = persistReducer(persistConfig, reducer)

@@ -14,7 +14,7 @@ import {useSubscription, useMutation} from '@apollo/client'
 
 import {addFavoriteQuery, addWatchlistQuery, getFavoriteQuery, getWatchlistQuery, removeFavoriteQuery, removeWatchlistQuery} from '../services/graphqlQuery'
 import Swal from 'sweetalert2'
-import {Redirect} from 'react-router-dom'
+import {useHistory} from 'react-router-dom'
 
 
 function Card({id, title, poster, rating}) {
@@ -22,6 +22,8 @@ function Card({id, title, poster, rating}) {
   const user = useSelector(state => state.user)
   const {data, loading} = useSubscription(getFavoriteQuery, {variables: {id: user}})
   const {data:watchList, loading:watchlistLoading} = useSubscription(getWatchlistQuery, {variables: {id: user}})
+
+  const history = useHistory()
 
   const [addFavorite] = useMutation(addFavoriteQuery)
   const [removeFavorite] = useMutation(removeFavoriteQuery)
@@ -62,7 +64,7 @@ function Card({id, title, poster, rating}) {
       confirmButtonText: 'Login'
     }).then((result) => {
       if (result.isConfirmed) {
-        return <Redirect to="/login"/>
+        history.push('/login')
       }
     })
   }

@@ -32,6 +32,19 @@ subscription MySubscription($id: uuid = "") {
   }
 }`
 
+export const getAllReviewQuery = gql`
+subscription MySubscription($id_movie: Int = 10) {
+  reviews(where: {id_movie: {_eq: $id_movie}}, order_by: {created_at: desc}) {
+    review
+    name {
+      username
+      rating_user(where: {id_movie: {_eq: $id_movie}}) {
+        rating
+      }
+    }
+  }
+}`
+
 
 export const addWatchlistQuery = gql`
 mutation MyMutation($id_movie: Int = 10, $id_user: uuid = "", $poster: String = "", $title: String = "") {

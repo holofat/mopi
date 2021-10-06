@@ -20,38 +20,38 @@ export const getGenreList = () => {
   return request
 }
 
-export const getDiscover = () => {
-  const url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}`
+export const getDiscover = page => {
+  const url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&page=${page}`
   const request = axios.get(url).then(res => res.data)
   return request
 }
 
-export const getDiscoverByVoteCount = () => {
-  const url = `https://api.themoviedb.org/3/discover/movie?api_key=1bc3f22930b9e6ac9ec9188b3b0ee950&language=en-US&sort_by=vote_count.desc&include_adult=false&include_video=false&page=1&with_watch_monetization_types=flatrate`
+export const getDiscoverByVoteCount = page => {
+  const url = `https://api.themoviedb.org/3/discover/movie?api_key=1bc3f22930b9e6ac9ec9188b3b0ee950&language=en-US&sort_by=vote_count.desc&include_adult=false&include_video=false&page=${page}&with_watch_monetization_types=flatrate`
   const request = axios.get(url).then(res => res.data)
   return request
 }
 
-export const searchMovie = query => {
-  const url = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=en-US&query=${query}&page=1&include_adult=false`
+export const searchMovie = (query, page) => {
+  const url = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=en-US&query=${query}&page=${page}&include_adult=false`
   const request = axios.get(url).then(res => res.data)
   return request
 }
 
-export const getDiscoverByRating = rating => {
+export const getDiscoverByRating = (rating, page) => {
   if(rating){
     rating = parseInt(rating)
     if (rating === 4){
-      let url = `https://api.themoviedb.org/3/discover/movie?api_key=1bc3f22930b9e6ac9ec9188b3b0ee950&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1&vote_average.lte=${rating+1}&with_watch_monetization_types=flatrate`
+      let url = `https://api.themoviedb.org/3/discover/movie?api_key=1bc3f22930b9e6ac9ec9188b3b0ee950&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=${page}&vote_average.lte=${rating+1}&with_watch_monetization_types=flatrate`
       const request = axios.get(url).then(res => res.data)
       return request
     } else {
-      let url = `https://api.themoviedb.org/3/discover/movie?api_key=1bc3f22930b9e6ac9ec9188b3b0ee950&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1&vote_average.gte=${rating}&vote_average.lte=${rating+1}&with_watch_monetization_types=flatrate`
+      let url = `https://api.themoviedb.org/3/discover/movie?api_key=1bc3f22930b9e6ac9ec9188b3b0ee950&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=${page}&vote_average.gte=${rating}&vote_average.lte=${rating+1}&with_watch_monetization_types=flatrate`
       const request = axios.get(url).then(res => res.data)
       return request
     }
   } else {
-    const url = `https://api.themoviedb.org/3/discover/movie?api_key=1bc3f22930b9e6ac9ec9188b3b0ee950&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1&with_watch_monetization_types=flatrate`
+    const url = `https://api.themoviedb.org/3/discover/movie?api_key=1bc3f22930b9e6ac9ec9188b3b0ee950&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=${page}&with_watch_monetization_types=flatrate`
     const request = axios.get(url).then(res => res.data)
     return request
   }
@@ -93,8 +93,22 @@ export const getRecommendations = id => {
   return request
 }
 
-export const getDiscoverByGenre = id => {
-  const url = `https://api.themoviedb.org/3/discover/movie?api_key=1bc3f22930b9e6ac9ec9188b3b0ee950&language=en-US&sort_by=vote_count.desc&include_adult=false&include_video=false&page=1&with_genres=${id}&with_watch_monetization_types=flatrate`
+export const getDiscoverByGenre = (id, page) => {
+  const url = `https://api.themoviedb.org/3/discover/movie?api_key=1bc3f22930b9e6ac9ec9188b3b0ee950&language=en-US&sort_by=vote_count.desc&include_adult=false&include_video=false&page=${page}&with_genres=${id}&with_watch_monetization_types=flatrate`
+  const request = axios.get(url).then(res => res.data)
+  return request
+}
+
+
+export const getTrailer = id => {
+  const url = `
+  https://api.themoviedb.org/3/movie/${id}/videos?api_key=${API_KEY}&language=en-US`
+  const request = axios.get(url).then(res => res.data)
+  return request
+}
+
+export const getDiscoverByDate = page => {
+  const url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US&sort_by=release_date.desc&include_adult=false&include_video=false&page=1&with_watch_monetization_types=flatrate&page=${page}`
   const request = axios.get(url).then(res => res.data)
   return request
 }
