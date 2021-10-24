@@ -92,8 +92,12 @@ export const Detail = () => {
   useTitle(movie.title ? movie.title : 'Loading')
 
   // If movie's data is not loaded, then return loader
-  if(!movie.id){
-    return <Code className="container"/>
+  if(!movie.id && movie?.name !== 'Error'){
+    return <div className={`${style.container} container`}><Code/></div>
+  }
+
+  if(movie?.name === 'Error'){
+    return <div className={`${style.container} container`}>ID Movie is not found</div>
   }
 
   const userInfo = {

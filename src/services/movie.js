@@ -65,7 +65,7 @@ export const getTopRated = () => {
 
 export const getDetail = id => {
   const url = `https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=en-US`
-  const request = axios.get(url).then(res => res.data)
+  const request = axios.get(url).then(res => res.data).catch(e => e.toJSON())
   return request
 }
 
